@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= page.title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    :root {
+      --color-primary: <%= page.colors?.primary || '#f97316' %>;
+      --color-secondary: <%= page.colors?.secondary || '#ea580c' %>;
+      --color-accent: <%= page.colors?.accent || '#fb923c' %>;
+    }
+    /* Styles pour le modal vidéo */
+    .video-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+    .video-modal.active {
+      display: flex;
+    }
+    .video-modal-content {
+      position: relative;
+      width: 90%;
+      max-width: 800px;
+      background: transparent;
+    }
+    .video-modal-close {
+      position: absolute;
+      top: -1.5rem;
+      right: -1.5rem;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+    }
+    .video-iframe {
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%; /* 16:9 */
+      position: relative;
+    }
+    .video-iframe iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-links">
+          <a href="#" class="nav-link"><i class="fas fa-envelope"></i>devis@publithings.com</a>
+          <a href="#" class="nav-link"><i class="fas fa-phone"></i>+33 (0) 9 80 80 03 63</a>
+        </div>
+        <div class="nav-auth">
+          <a href="#devis" class="button button-primary">Demander un devis</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <% page.sections.forEach(section => { %>
+    <% if (section.type === 'hero') { %>
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <!-- Left side - Content -->
+            <div class="hero-text">
+              <h1><%- section.title %></h1>
+              <div class="underline"></div>
+              <p><%- section.content %></p>
+              <div class="hero-buttons">
+                <!-- Bouton qui ouvre le modal -->
+                <a href="javascript:void(0)" id="openVideoModal" class="button button-text">
+                  <img src="/images/iconly-light-play.svg" alt="Play icon" class="icon-play">
+                  <span>Voir la vidéo</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Right side - Form -->
+            <div class="form-container">
+              <div class="form-wrapper" id="devis">
+                <h2>Demandez votre devis gratuit</h2>
+                <form id="quoteForm" action="/submit-form" method="POST">
+                  <div class="form-group">
+                    <input type="text" name="name" placeholder="Nom & prénom(s)" required>
+                  </div>
+                  <div class="form-group">
+                    <input type="text" name="company" placeholder="Entreprise" required>
+                  </div>
+                  <div class="form-group">
+                    <input type="email" name="email" placeholder="Email" required>
+                  </div>
+                  <div class="form-group">
+                    <select name="budget" required>
+                      <option value="">Sélectionnez votre budget</option>
+                      <option value="1000">Moins de 1 000 €</option>
+                      <option value="5000">Entre 1 000 € et 5 000 €</option>
+                      <option value="5000+">Plus de 5 000 €</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <textarea name="details" placeholder="Donnez-nous quelques détails sur votre projet..." required></textarea>
+                  </div>
+                  <button type="submit" class="button button-primary">
+                    Obtenir mon devis gratuit
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Companies Section -->
+      <section class="companies">
+        <div class="container">
+          <div class="companies-grid">
+            <div class="company">
+              <img src="/images/1.png" class="company-logo">
+            </div>
+            <div class="company">
+              <img src="/images/2.png" class="company-logo">
+            </div>
+            <div class="company">
+              <img src="/images/3.png" class="company-logo">
+            </div>
+            <div class="company">
+              <img src="/images/4.png" class="company-logo">
+            </div>
+            <div class="company">
+              <img src="/images/5.png" class="company-logo">
+            </div>
+          </div>
+        </div>
+      </section>
+    <% } else if (section.type === 'video') { %>
+      <!-- Benefits Section -->
+      <section class="benefits">
+        <div class="container">
+          <div class="benefits-content">
+            <div class="benefits-text">
+              <h2><%- section.title %></h2>
+              <div class="income-card">
+                <%- section.content %>
+                <div class="income-amount">
+                  <span></span>
+                  <img src="/images/ellipse-454.svg" alt="Chart">
+                </div>
+              </div>
+            </div>
+            <div class="benefits-cards">
+              <img src="<%- section.imageUrl %>" alt="">
+            </div>
+          </div>
+        </div>
+      </section>
+    <% } else if (section.type === 'features') { %>
+      <!-- Features Section -->
+      <section class="features">
+        <div class="container">
+          <div class="features-header">
+            <h2><%- section.title %></h2>
+            <p><%- section.content %></p>
+            <div class="ratings">
+              <div class="rating">
+                <div class="stars">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                </div>
+                <p><strong>4.9</strong> / 5 par nos</p>
+                <span>clients</span>
+              </div>
+              <div class="rating">
+                <div class="stars">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                  <img src="/images/star-7.svg" alt="Star">
+                </div>
+                <p><strong>4.8</strong> / 5 par</p>
+                <span>les invités</span>
+              </div>
+            </div>
+          </div>
+          <div class="features-grid">
+            <% section.features.forEach(feature => { %>
+              <div class="feature">
+                <div class="feature-icon">
+                  <img src="/images/command-1.svg" alt="Engagement">
+                </div>
+                <h3><%- feature.title %></h3>
+                <%- feature.description %>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </section>
+
+      <!-- Partout en France -->
+      <section class="partout">
+        <div class="container">
+          <img src="/images/partout.png" alt="Partout en France">
+        </div>
+      </section>
+    <% } else if (section.type === 'conclusion') { %>
+      <!-- Collaboration Section -->
+      <section class="collaboration">
+        <div class="container">
+          <div class="collaboration-header">
+            <h2>Votre partenaire événementiel de confiance</h2>
+            <p>Chez Publithings, nous croyons fermement en la puissance de l'innovation pour transformer chaque événement en une réussite mémorable. Confiez-nous vos projets et bénéficiez de notre expertise pour garantir une expérience unique et enrichissante à vos invités.</p>
+            <a href="#devis" class="button button-primary">Nous contacter</a>
+          </div>
+          <div class="collaboration-grid">
+            <div class="collab-card">
+              Chaque événement est une opportunité unique de créer des souvenirs durables et marquants. En tant qu'experts passionnés par l'intégration des nouvelles technologies et des animations innovantes, nous nous engageons à concevoir pour vous des expériences sur mesure, originales et à fort impact. 
+              Grâce à notre approche personnalisée, notre accompagnement dédié et notre rigueur professionnelle, nous transformons vos idées en événements mémorables qui captivent, surprennent et inspirent votre audience. Faire appel à notre savoir-faire, c’est choisir un partenaire fiable qui dépasse systématiquement vos attentes, valorise votre image, et garantit une expérience inoubliable à chacun de vos invités.
+            </div>
+            <div class="collab-card">
+              <%- section.content %>
+            </div>
+          </div>
+        </div>
+      </section>
+    <% } %>
+  <% }) %>
+
+<!-- Modal vidéo -->
+<div id="videoModal" class="video-modal">
+  <div class="video-modal-content">
+    <span id="closeVideoModal" class="video-modal-close">&times;</span>
+    <div class="video-iframe">
+      <% 
+        // On génère l'URL embed YouTube (avec autoplay=1) et on la stocke dans data-src
+        let videoId = '';
+        const heroSection = page.sections.find(s => s.type === 'hero');
+        if (heroSection?.videoUrl) {
+          const url = heroSection.videoUrl;
+          const match = url.match(/[?&]v=([^&]+)/);
+          if (match) {
+            videoId = match[1];
+          }
+        }
+        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      %>
+      <!-- On laisse src vide ici, mais on stocke l'URL complète dans data-src -->
+      <iframe
+        id="youtubePlayer"
+        data-src="<%= embedUrl %>"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+          <div class="testimonial-card">
+            <img src="/images/group-212.png" alt="Quote" class="quote-icon">
+            <div class="testimonial-content">
+              <p class="testimonial-text">
+                "Une expérience exceptionnelle ! Grâce à l'accompagnement réactif et professionnel, notre événement a largement dépassé nos attentes. Nos invités en parlent encore 😍"
+              </p>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <h4>Benoît Z.</h4>
+                  <p>Responsable Communication</p>
+                </div>
+                <div class="testimonial-avatars">
+                  <img src="/images/ellipse-54.png" alt="User" class="avatar">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <img src="/images/group-212.png" alt="Quote" class="quote-icon">
+            <div class="testimonial-content">
+              <p class="testimonial-text">
+                "Nous avons été bluffés par la qualité du service et l’originalité de la prestation. Un véritable atout pour se démarquer lors d’événements professionnels."
+              </p>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <h4>Laurent D.</h4>
+                  <p>Directeur Marketing</p>
+                </div>
+                <div class="testimonial-avatars">
+                  <img src="/images/ellipse-56.png" alt="User" class="avatar">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <img src="/images/group-212.png" alt="Quote" class="quote-icon">
+            <div class="testimonial-content">
+              <p class="testimonial-text">
+                "Une équipe à l’écoute, réactive et passionnée. Notre événement a été un franc succès, marqué par l’innovation et l’excellence. Je recommande vivement !"
+              </p>
+              <div class="testimonial-author">
+                <div class="author-info">
+                  <h4>Eric L.</h4>
+                  <p>Chef de projet événementiel</p>
+                </div>
+                <div class="testimonial-avatars">
+                  <img src="/images/ellipse-57.png" alt="User" class="avatar">
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; <%= new Date().getFullYear() %> Publithings. Tous droits réservés</p>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  const openBtn = document.getElementById('openVideoModal');
+  const closeBtn = document.getElementById('closeVideoModal');
+  const modal = document.getElementById('videoModal');
+  const iframe = document.getElementById('youtubePlayer');
+
+  // On lit l'URL complète depuis data-src (sans la mettre dans src pour l'instant)
+  const initialSrc = iframe.getAttribute('data-src');
+
+  openBtn.addEventListener('click', () => {
+    // Au clic, on assigne l'URL (avec autoplay=1) au src de l'iframe
+    iframe.src = initialSrc;
+    modal.classList.add('active');
+  });
+
+  function closeModal() {
+    modal.classList.remove('active');
+    // On vide le src pour stopper immédiatement la vidéo
+    iframe.src = '';
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+</script>
+
+
+</body>
+</html>

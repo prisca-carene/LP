@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modifier la Landing Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="/tinymce/tinymce.min.js"></script>
+  <script>tinymce.baseURL = '/tinymce';</script>
+  <style>
+    .tox-tinymce { border-radius: 0.375rem; }
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .form-card {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    .error-message {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    .input-field {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.375rem;
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #1279FD;
+      box-shadow: 0 0 0 3px rgba(18, 121, 253, 0.1);
+    }
+    .input-field.error { border-color: #dc2626; }
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background-color: #1279FD;
+      color: white;
+    }
+    .btn-primary:hover { background-color: #0e63d1; }
+    .btn-danger {
+      background-color: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover { background-color: #b91c1c; }
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .loading::after { content: "..."; }
+    .color-picker {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-color: transparent;
+      width: 50px;
+      height: 50px;
+      border: none;
+      cursor: pointer;
+    }
+    .color-picker::-webkit-color-swatch {
+      border-radius: 8px;
+      border: 2px solid #e5e7eb;
+    }
+    .color-picker::-moz-color-swatch {
+      border-radius: 8px;
+      border: 2px solid #e5e7eb;
+    }
+    .color-input {
+      width: 120px;
+      padding: 0.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      font-family: monospace;
+    }
+    .loading-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #1279FD;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .regenerate-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #f3f4f6;
+      color: #374151;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .regenerate-button:hover { background-color: #e5e7eb; }
+    .regenerate-button:active { background-color: #d1d5db; }
+    .regenerate-button svg { width: 1rem; height: 1rem; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 bg-white shadow-lg max-h-screen w-60">
+    <div class="flex flex-col justify-between h-full">
+      <div class="flex-grow">
+        <div class="px-4 py-6 text-center border-b">
+          <h1 class="text-xl font-bold leading-none"><span class="text-[#1279FD]">Admin</span> Panel</h1>
+        </div>
+        <div class="p-4">
+          <ul class="space-y-1">
+            <li>
+              <a href="/admin" class="flex items-center text-gray-600 hover:bg-gray-50 rounded-lg px-4 py-3 text-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="/admin/create" class="flex items-center bg-blue-50 rounded-lg font-bold text-[#1279FD] px-4 py-3 text-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v16m8-8H4" />
+                </svg>
+                Nouvelle Page
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="p-4">
+        <a href="/logout" class="flex items-center text-gray-600 hover:text-gray-900 w-full px-4 py-2 text-sm">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Déconnexion
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-60 p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="mb-8">
+        <a href="/admin" class="text-[#1279FD] hover:text-[#0e63d1] flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Retour à l'administration
+        </a>
+      </div>
+
+      <div class="form-card p-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Modifier la Landing Page</h1>
+
+        <form id="editForm" class="space-y-6">
+          <!-- Titre & Slug -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" for="title">
+              Titre de la page
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              class="input-field"
+              value="<%= page.title %>"
+              onchange="updateSlug()"
+              required>
+            <div class="error-message" id="title-error"></div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" for="slug">
+              Slug de la page
+            </label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              class="input-field"
+              value="<%= page.slug %>"
+              required>
+            <div class="error-message" id="slug-error"></div>
+          </div>
+
+          <!-- Couleurs -->
+          <div>
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Couleurs de la page</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Couleur principale
+                </label>
+                <div class="flex items-center space-x-2">
+                  <input
+                    type="color"
+                    class="color-picker"
+                    id="primaryColor"
+                    value="<%= colors.primary %>"
+                    onchange="updateColorInput('primary', this.value)">
+                  <input
+                    type="text"
+                    class="color-input"
+                    id="primaryColorInput"
+                    value="<%= colors.primary %>"
+                    onchange="updateColorPicker('primary', this.value)">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Couleur secondaire
+                </label>
+                <div class="flex items-center space-x-2">
+                  <input
+                    type="color"
+                    class="color-picker"
+                    id="secondaryColor"
+                    value="<%= colors.secondary %>"
+                    onchange="updateColorInput('secondary', this.value)">
+                  <input
+                    type="text"
+                    class="color-input"
+                    id="secondaryColorInput"
+                    value="<%= colors.secondary %>"
+                    onchange="updateColorPicker('secondary', this.value)">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Couleur d'accent
+                </label>
+                <div class="flex items-center space-x-2">
+                  <input
+                    type="color"
+                    class="color-picker"
+                    id="accentColor"
+                    value="<%= colors.accent %>"
+                    onchange="updateColorInput('accent', this.value)">
+                  <input
+                    type="text"
+                    class="color-input"
+                    id="accentColorInput"
+                    value="<%= colors.accent %>"
+                    onchange="updateColorPicker('accent', this.value)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sections -->
+          <div>
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Sections</h2>
+            <div id="sections" class="space-y-6">
+              <% page.sections.forEach((section, index) => { %>
+                <div class="form-card p-6" data-section-id="section-<%= index %>">
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Type de section
+                    </label>
+                    <select onchange="updateSectionFields(this)" class="input-field">
+                      <option value="hero" <%= section.type === 'hero' ? 'selected' : '' %>>Hero</option>
+                      <option value="video" <%= section.type === 'video' ? 'selected' : '' %>>A propos</option>
+                      <option value="features" <%= section.type === 'features' ? 'selected' : '' %>>Services</option>
+                      <option value="conclusion" <%= section.type === 'conclusion' ? 'selected' : '' %>>Conclusion</option>
+                    </select>
+                  </div>
+
+                  <div class="section-fields">
+                    <% if (section.type === 'hero') { %>
+                      <div class="space-y-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                          <input
+                            type="text"
+                            name="title"
+                            value="<%= section.title %>"
+                            class="input-field">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Texte</label>
+                          <textarea id="section-<%= index %>-content" class="tinymce"><%= section.content %></textarea>
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">URL de la vidéo</label>
+                          <input
+                            type="url"
+                            name="videoUrl"
+                            value="<%= section.videoUrl || '' %>"
+                            class="input-field">
+      
+                        </div>
+                      </div>
+
+                    <% } else if (section.type === 'video') { %>
+                      <div class="space-y-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                          <input
+                            type="text"
+                            name="title"
+                            value="<%= section.title %>"
+                            class="input-field">
+                        </div>
+
+                        <!-- 1) Sélection depuis médiathèque -->
+                        <div class="mb-4">
+                          <p class="text-sm text-gray-600 mb-2">Choisir une image existante&nbsp;:</p>
+                          <div class="grid grid-cols-4 gap-2 max-h-60 overflow-auto border rounded p-2">
+                            <% imagesList.forEach(imgUrl => { %>
+                              <div class="relative cursor-pointer group">
+                                <input
+                                  type="radio"
+                                  name="existingImage"
+                                  value="<%= imgUrl %>"
+                                  class="hidden"
+                                  <% if (section.imageUrl === imgUrl) { %> checked <% } %>>
+                                <img
+                                  src="<%= imgUrl %>"
+                                  alt="Miniature"
+                                  class="w-full h-20 object-cover rounded border group-hover:border-blue-500 transition"
+                                  onclick="this.previousElementSibling.checked = true">
+                                <% if (section.imageUrl === imgUrl) { %>
+                                  <div class="absolute inset-0 ring-2 ring-blue-500 rounded pointer-events-none"></div>
+                                <% } %>
+                              </div>
+                            <% }) %>
+                          </div>
+                        </div>
+
+                        <!-- 2) Upload d'une nouvelle image -->
+                        <div class="mb-2">
+                          <p class="text-sm text-gray-600 mb-1">Ou uploader une nouvelle :</p>
+                          <input
+                            type="file"
+                            name="image"
+                            accept="image/*"
+                            class="input-field"
+                            onchange="validateImageSize(this)">
+                          <input
+                            type="hidden"
+                            name="currentImageUrl"
+                            value="<%= section.imageUrl %>">
+                          <p class="text-sm text-gray-500 mt-1">Taille maximale : 5 Mo</p>
+                        </div>
+
+                        <!-- 3) Aperçu -->
+                        <% if (section.imageUrl) { %>
+                          <img
+                            id="preview-section-<%= index %>"
+                            src="<%= section.imageUrl %>"
+                            alt="Aperçu"
+                            class="mt-2 max-w-xs rounded shadow-sm">
+                        <% } else { %>
+                          <img
+                            id="preview-section-<%= index %>"
+                            src=""
+                            alt="Aperçu"
+                            class="mt-2 max-w-xs rounded shadow-sm hidden">
+                        <% } %>
+
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                          <textarea id="section-<%= index %>-content" class="tinymce"><%= section.content %></textarea>
+                        </div>
+                      </div>
+
+                    <% } else if (section.type === 'features') { %>
+                      <div class="space-y-4">
+                        <!-- Texte d'intro Services -->
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-2">Texte d'introduction</label>
+                          <div class="flex items-center gap-2 mb-2">
+                            <button
+                              type="button"
+                              class="regenerate-button"
+                              onclick="regenerateContent('features-intro', '<%= index %>')">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              Régénérer
+                            </button>
+                          </div>
+                          <textarea id="section-<%= index %>-content" class="tinymce"><%= section.content %></textarea>
+                        </div>
+
+                        <!-- Liste Services existants -->
+                        <div class="features-list space-y-4">
+                          <% section.features.forEach((feature, featureIndex) => { %>
+                            <div class="feature-item form-card p-6">
+                              <div class="space-y-4">
+                                <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                                  <input
+                                    type="text"
+                                    value="<%= feature.title %>"
+                                    class="input-field">
+                                </div>
+                                <div>
+                                  <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                  <div class="flex items-center gap-2 mb-2">
+                                    <button
+                                      type="button"
+                                      class="regenerate-button"
+                                      onclick="regenerateContent('feature-description', '<%= index %>', <%= featureIndex %>)">
+                                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                      </svg>
+                                      Régénérer
+                                    </button>
+                                  </div>
+                                  <textarea
+                                    id="feature-<%= index %>-<%= featureIndex %>-content"
+                                    class="tinymce"><%= feature.description %></textarea>
+                                </div>
+                                <button
+                                  type="button"
+                                  class="btn btn-danger"
+                                  onclick="removeFeature(this)">
+                                  <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                  Supprimer
+                                </button>
+                              </div>
+                            </div>
+                          <% }) %>
+                        </div>
+
+                        <button
+                          type="button"
+                          class="btn bg-green-500 text-white hover:bg-green-600"
+                          onclick="addFeature(this)">
+                          <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 4v16m8-8H4" />
+                          </svg>
+                          Ajouter un service
+                        </button>
+                      </div>
+
+                    <% } else if (section.type === 'conclusion') { %>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Texte</label>
+                        <div class="flex items-center gap-2 mb-2">
+                          <button
+                            type="button"
+                            class="regenerate-button"
+                            onclick="regenerateContent('conclusion', '<%= index %>')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Régénérer
+                          </button>
+                        </div>
+                        <textarea id="section-<%= index %>-content" class="tinymce"><%= section.content %></textarea>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="mt-4 btn btn-danger"
+                    onclick="removeSection(this)">
+                    Supprimer la section
+                  </button>
+                </div>
+              <% }); %>
+            </div>
+
+            <button
+              type="button"
+              class="mt-4 btn bg-green-500 text-white hover:bg-green-600"
+              onclick="addSection()">
+              <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Ajouter une section
+            </button>
+          </div>
+
+          <input type="hidden" name="sections" id="sectionsData">
+          <input type="hidden" name="colors" id="colorsData">
+
+          <div class="flex justify-end pt-6 border-t">
+            <button
+              type="submit"
+              id="submitButton"
+              class="btn btn-primary"
+              onclick="submitForm(event)">
+              <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M5 13l4 4L19 7" />
+              </svg>
+              Enregistrer les modifications
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let editorsInitialized = false;
+
+    function clearErrors() {
+      document.querySelectorAll('.error-message').forEach(el => {
+        el.textContent = '';
+        el.style.display = 'none';
+      });
+      document.querySelectorAll('.input-field').forEach(el => {
+        el.classList.remove('error');
+      });
+    }
+
+    function showError(field, message) {
+      const errorElement = document.getElementById(`${field}-error`);
+      const inputElement = document.getElementById(field);
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+      }
+      if (inputElement) {
+        inputElement.classList.add('error');
+      }
+    }
+
+    function initTinyMCE(selector) {
+      tinymce.init({
+        selector,
+        height: 300,
+        menubar: false,
+        plugins:
+          'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table codesample help wordcount',
+        toolbar:
+          'undo redo | formatselect | ' +
+          'bold italic underline | alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist outdent indent | forecolor backcolor | ' +
+          'link image media table codesample | code | help',
+        file_picker_types: 'image',
+        file_picker_callback: function (callback, value, meta) {
+          if (meta.filetype === 'image') {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.onchange = function () {
+              const file = this.files[0];
+              const fd = new FormData();
+              fd.append('image', file);
+              fetch('/admin/upload-image', { method: 'POST', body: fd })
+                .then(res => {
+                  if (!res.ok) throw new Error('HTTP ' + res.status);
+                  return res.json();
+                })
+                .then(json => callback(json.location, { alt: file.name }))
+                .catch(err => {
+                  console.error(err);
+                  alert('Upload failed: ' + err.message);
+                });
+            };
+            input.click();
+          }
+        },
+        content_style: 'body { font-family:Inter, sans-serif; font-size:14px }'
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.tinymce').forEach((el, i) => {
+        if (!el.id) el.id = `editor-${i}-${Date.now()}`;
+        initTinyMCE(`#${el.id}`);
+      });
+
+      // Attacher l’aperçu des nouveaux fichiers
+      document.querySelectorAll('input[type="file"][name="image"]').forEach((fileInput, idx) => {
+        fileInput.addEventListener('change', () => previewImage(fileInput, idx));
+      });
+    });
+
+    function getEditorContent(editorId) {
+      const editor = tinymce.get(editorId);
+      if (editor) return editor.getContent();
+      console.warn(`Editor ${editorId} not found`);
+      return '';
+    }
+
+    async function regenerateContent(type, sectionIndex, featureIndex = null) {
+      const sectionElement = document.querySelector(`[data-section-id='section-${sectionIndex}']`);
+      let editorId;
+      let title;
+      switch (type) {
+        case 'hero-content':
+          title = sectionElement.querySelector('input[type="text"]').value;
+          editorId = `section-${sectionIndex}-content`;
+          break;
+        case 'video-description':
+          title = sectionElement.querySelector('input[type="text"]').value;
+          editorId = `section-${sectionIndex}-content`;
+          break;
+        case 'features-intro':
+          editorId = `section-${sectionIndex}-content`;
+          break;
+        case 'feature-description':
+          const featureElement = sectionElement.querySelectorAll('.feature-item')[featureIndex];
+          title = featureElement.querySelector('input[type="text"]').value;
+          editorId = `feature-${sectionIndex}-${featureIndex}-content`;
+          break;
+        case 'conclusion':
+          editorId = `section-${sectionIndex}-content`;
+          break;
+      }
+      try {
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        const response = await fetch('/admin/regenerate-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type,
+            title,
+            currentContent: getEditorContent(editorId)
+          })
+        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        if (data.content) {
+          const editor = tinymce.get(editorId);
+          if (editor) editor.setContent(data.content);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la régénération du contenu.');
+      } finally {
+        document.getElementById('loadingOverlay').style.display = 'none';
+      }
+    }
+
+    function updateColorInput(type, value) {
+      document.getElementById(`${type}ColorInput`).value = value;
+    }
+
+    function updateColorPicker(type, value) {
+      if (/^#[0-9A-F]{6}$/i.test(value)) {
+        document.getElementById(`${type}Color`).value = value;
+      }
+    }
+
+    function validateImageSize(input) {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (input.files[0] && input.files[0].size > maxSize) {
+        alert('L\'image est trop volumineuse. La taille maximale est de 5 Mo.');
+        input.value = '';
+      }
+    }
+
+    function updateSlug() {
+      const title = document.getElementById('title').value;
+      const slug = title
+        .toLowerCase()
+        .replace(/[éèê]/g, 'e')
+        .replace(/[àâ]/g, 'a')
+        .replace(/[ùû]/g, 'u')
+        .replace(/[ôö]/g, 'o')
+        .replace(/[ïî]/g, 'i')
+        .replace(/[ç]/g, 'c')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      document.getElementById('slug').value = slug;
+    }
+
+    function addSection() {
+      const sectionsContainer = document.getElementById('sections');
+      const newSectionIndex = sectionsContainer.children.length;
+      const sectionTemplate = `
+        <div class="form-card p-6" data-section-id="section-${newSectionIndex}">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Type de section
+            </label>
+            <select onchange="updateSectionFields(this)" class="input-field">
+              <option value="hero">Hero</option>
+              <option value="video">A propos</option>
+              <option value="features">Services</option>
+              <option value="conclusion">Conclusion</option>
+            </select>
+          </div>
+          <div class="section-fields">
+            <!-- Fields will be added by updateSectionFields -->
+          </div>
+          <button type="button"
+                  class="mt-4 btn btn-danger"
+                  onclick="removeSection(this)">
+            <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Supprimer la section
+          </button>
+        </div>
+      `;
+      const tempContainer = document.createElement('div');
+      tempContainer.innerHTML = sectionTemplate;
+      const newSection = tempContainer.firstElementChild;
+      sectionsContainer.appendChild(newSection);
+      updateSectionFields(newSection.querySelector('select'));
+    }
+
+    function removeSection(button) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) {
+        const section = button.closest('.form-card');
+        section.remove();
+      }
+    }
+
+    function addFeature(button) {
+      const featuresList = button.previousElementSibling;
+      const newFeatureIndex = featuresList.children.length;
+      const sectionIndex = button.closest('[data-section-id]').getAttribute('data-section-id').split('-')[1];
+      const featureTemplate = `
+        <div class="feature-item form-card p-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+              <input type="text" class="input-field">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <div class="flex items-center gap-2 mb-2">
+                <button type="button"
+                        class="regenerate-button"
+                        onclick="regenerateContent('feature-description', '${sectionIndex}', ${newFeatureIndex})">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Régénérer
+                </button>
+              </div>
+              <textarea id="feature-${sectionIndex}-${newFeatureIndex}-content" class="tinymce"></textarea>
+            </div>
+            <button type="button"
+                    class="btn btn-danger"
+                    onclick="removeFeature(this)">
+              <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Supprimer
+            </button>
+          </div>
+        </div>
+      `;
+      const tempContainer = document.createElement('div');
+      tempContainer.innerHTML = featureTemplate;
+      const newFeature = tempContainer.firstElementChild;
+      featuresList.appendChild(newFeature);
+      initTinyMCE(`#feature-${sectionIndex}-${newFeatureIndex}-content`);
+    }
+
+    function removeFeature(button) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) {
+        const feature = button.closest('.feature-item');
+        feature.remove();
+      }
+    }
+
+    function updateSectionFields(select) {
+      const section = select.closest('.form-card');
+      const sectionFields = section.querySelector('.section-fields');
+      const sectionIndex = section.getAttribute('data-section-id').split('-')[1];
+      let template = '';
+
+      switch (select.value) {
+        case 'hero':
+          template = `
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                <input type="text" class="input-field">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Texte</label>
+                <div class="flex items-center gap-2 mb-2">
+                  <button type="button"
+                          class="regenerate-button"
+                          onclick="regenerateContent('hero-content', '${sectionIndex}')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Régénérer
+                  </button>
+                </div>
+                <textarea id="section-${sectionIndex}-content" class="tinymce"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">URL de la vidéo</label>
+                <input type="url" class="input-field" placeholder="https://www.youtube.com/watch?v=...">
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'video':
+          template = `
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                <input type="text" class="input-field">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Image</label>
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  class="input-field"
+                  onchange="validateImageSize(this)">
+                <p class="text-sm text-gray-500 mt-1">Taille maximale : 5 Mo</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <div class="flex items-center gap-2 mb-2">
+                  <button type="button"
+                          class="regenerate-button"
+                          onclick="regenerateContent('video-description', '${sectionIndex}')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Régénérer
+                  </button>
+                </div>
+                <textarea id="section-${sectionIndex}-content" class="tinymce"></textarea>
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'features':
+          template = `
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Texte d'introduction</label>
+                <div class="flex items-center gap-2 mb-2">
+                  <button type="button"
+                          class="regenerate-button"
+                          onclick="regenerateContent('features-intro', '${sectionIndex}')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Régénérer
+                  </button>
+                </div>
+                <textarea id="section-${sectionIndex}-content" class="tinymce"></textarea>
+              </div>
+              <div class="features-list space-y-4"></div>
+              <button type="button"
+                      class="btn bg-green-500 text-white hover:bg-green-600"
+                      onclick="addFeature(this)">
+                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v16m8-8H4" />
+                </svg>
+                Ajouter un service
+              </button>
+            </div>
+          `;
+          break;
+
+        case 'conclusion':
+          template = `
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Texte</label>
+              <div class="flex items-center gap-2 mb-2">
+                <button type="button"
+                        class="regenerate-button"
+                        onclick="regenerateContent('conclusion', '${sectionIndex}')">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Régénérer
+                </button>
+              </div>
+              <textarea id="section-${sectionIndex}-content" class="tinymce"></textarea>
+            </div>
+          `;
+          break;
+      }
+
+      sectionFields.innerHTML = template;
+      initTinyMCE(`#section-${sectionIndex}-content`);
+    }
+
+    // Afficher aperçu d’un nouveau fichier uploadé
+    function previewImage(input, index) {
+      const preview = document.getElementById(`preview-section-${index}`);
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    async function submitForm(event) {
+      event.preventDefault();
+      clearErrors();
+
+      const submitButton = document.getElementById('submitButton');
+      submitButton.disabled = true;
+      submitButton.classList.add('loading');
+      document.getElementById('loadingOverlay').style.display = 'flex';
+
+      try {
+        const formData = new FormData();
+        // Champs basiques
+        formData.append('title', document.getElementById('title').value);
+        formData.append('slug', document.getElementById('slug').value);
+        // Couleurs
+        const colors = {
+          primary: document.getElementById('primaryColor').value,
+          secondary: document.getElementById('secondaryColor').value,
+          accent: document.getElementById('accentColor').value
+        };
+        formData.append('colors', JSON.stringify(colors));
+
+        // Sections
+        const sections = [];
+        document.querySelectorAll('[data-section-id]').forEach((sectionEl, index) => {
+          const type = sectionEl.querySelector('select').value;
+          const section = { type };
+
+          switch (type) {
+            case 'hero':
+              section.title = sectionEl.querySelector('input[type="text"]').value;
+              section.content = getEditorContent(`section-${index}-content`);
+              section.videoUrl = sectionEl.querySelector('input[type="url"]').value;
+              break;
+
+            case 'video':
+              section.title = sectionEl.querySelector('input[type="text"]').value;
+              section.content = getEditorContent(`section-${index}-content`);
+
+              // 1) Si sélection d'une image existante
+              const chosenExisting = sectionEl.querySelector('input[name="existingImage"]:checked');
+              if (chosenExisting) {
+                section.imageUrl = chosenExisting.value;
+              }
+
+              // 2) Si upload nouvelle image
+              const imageFile = sectionEl.querySelector('input[type="file"][name="image"]').files[0];
+              if (imageFile) {
+                formData.append('image', imageFile);
+              } else if (!chosenExisting) {
+                // 3) Si rien de changé, on garde l'ancienne URL
+                const currentImageUrl = sectionEl.querySelector('input[name="currentImageUrl"]').value;
+                section.imageUrl = currentImageUrl;
+              }
+              break;
+
+            case 'features':
+              section.content = getEditorContent(`section-${index}-content`);
+              section.features = [];
+              sectionEl.querySelectorAll('.feature-item').forEach((featureEl, featureIndex) => {
+                section.features.push({
+                  title: featureEl.querySelector('input[type="text"]').value,
+                  description: getEditorContent(`feature-${index}-${featureIndex}-content`)
+                });
+              });
+              break;
+
+            case 'conclusion':
+              section.content = getEditorContent(`section-${index}-content`);
+              break;
+          }
+
+          sections.push(section);
+        });
+        formData.append('sections', JSON.stringify(sections));
+
+        // ID page
+        const pageId = window.location.pathname.split('/').pop();
+        const response = await fetch(`/admin/edit/${pageId}`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            if (data.errors) {
+              Object.entries(data.errors).forEach(([field, message]) => {
+                showError(field, message);
+              });
+            } else {
+              throw new Error(data.message || 'Une erreur est survenue');
+            }
+          } else {
+            throw new Error('Une erreur est survenue lors de la communication avec le serveur');
+          }
+        } else {
+          const data = await response.json();
+          if (data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            window.location.href = '/admin';
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de l\'enregistrement des modifications.');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.classList.remove('loading');
+        document.getElementById('loadingOverlay').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
